@@ -1,20 +1,23 @@
 package Cancion;
 
 public class CancionPremium extends Cancion {
-    private boolean altaCalidad;
+    private boolean descarga;
 
-    public CancionPremium(int id, String nombre, String artista, String popularidad, int year, int duracionMs, boolean altaCalidad) {
-        super(id, nombre, artista, popularidad, year, duracionMs);
-        this.altaCalidad = altaCalidad;
+    public CancionPremium(int id, String nombre, String artista, int year, int duracionMs, boolean descarga) {
+        super(id, nombre, artista, year, duracionMs);
+        this.descarga = descarga;
     }
 
-    @Override
-    public void reproducir() {
-        int segundos = duracionMs / 1000;
-        System.out.println("Reproduciendo en alta calidad: " + nombre + " de " + artista + " (" + segundos + " segundos)");
+    public CancionPremium(String nombre, String artista, int year, int duracionMs, boolean descarga) {
+        super(nombre, artista, year, duracionMs);
+        this.descarga = descarga;
     }
 
-    public boolean isAltaCalidad() {
-        return altaCalidad;
+    public boolean isDescargable() {
+        return descarga;
+    }
+
+    public void setDescarga(boolean descarga) {
+        this.descarga = descarga;
     }
 }

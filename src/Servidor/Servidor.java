@@ -29,24 +29,29 @@ public class Servidor {
             return gson.toJson("🎵 Servidor activo");
         });
 
-        // Obtener canciones con paginación
         get("/canciones/paginado", (req, res) -> {
             res.type("application/json");
 
+            // Valores por defecto: los primeros 100
             int offset = 0;
             int limit = 100;
 
-            try {
-                offset = Integer.parseInt(req.queryParams("offset"));
-                limit = Integer.parseInt(req.queryParams("limit"));
-            } catch (Exception e) {
-                // Valores por defecto
+            // Si el frontend manda ?offset=100&limit=100, se usan esos
+            if (req.queryParams("offset") != null) {
+                try {
+                    offset = Integer.parseInt(req.queryParams("offset"));
+                } catch (NumberFormatException ignored) {}
+            }
+
+            if (req.queryParams("limit") != null) {
+                try {
+                    limit = Integer.parseInt(req.queryParams("limit"));
+                } catch (NumberFormatException ignored) {}
             }
 
             List<Cancion> canciones = dao.obtenerCancionesPaginado(offset, limit);
             return gson.toJson(canciones);
         });
-
 
         // Agregar canción (nombre, artista, año, duración)
         post("/agregar", (req, res) -> {

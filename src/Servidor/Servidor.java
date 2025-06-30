@@ -16,27 +16,41 @@ public class Servidor {
     public static void main(String[] args) {
         port(4567);
 
-        // Habilitar CORS
+        // 🛡️ Preflight CORS
+        options("/*", (request, response) -> {
+            String headers = request.headers("Access-Control-Request-Headers");
+            if (headers != null) {
+                response.header("Access-Control-Allow-Headers", headers);
+            }
+
+            String methods = request.headers("Access-Control-Request-Method");
+            if (methods != null) {
+                response.header("Access-Control-Allow-Methods", methods);
+            }
+
+            return "OK";
+        });
+
+        // ✅ Permitir CORS para todas las rutas
         before((req, res) -> {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
             res.header("Access-Control-Allow-Headers", "*");
         });
 
-        // Ruta de prueba
+        // 🔄 Ruta de prueba
         get("/", (req, res) -> {
             res.type("application/json");
             return gson.toJson("🎵 Servidor activo");
         });
 
+        // ✅ Obtener canciones paginadas
         get("/canciones/paginado", (req, res) -> {
             res.type("application/json");
 
-            // Valores por defecto: los primeros 100
             int offset = 0;
             int limit = 100;
 
-            // Si el frontend manda ?offset=100&limit=100, se usan esos
             if (req.queryParams("offset") != null) {
                 try {
                     offset = Integer.parseInt(req.queryParams("offset"));
@@ -53,7 +67,7 @@ public class Servidor {
             return gson.toJson(canciones);
         });
 
-        // Agregar canción (nombre, artista, año, duración)
+        // 🎶 Agregar nueva canción
         post("/agregar", (req, res) -> {
             res.type("application/json");
 
@@ -78,37 +92,32 @@ public class Servidor {
             }
         });
 
-        // Buscar por nombre
+        // 🔍 Buscar por nombre
         get("/buscar/nombre", (req, res) -> {
             res.type("application/json");
             String nombre = req.queryParams("nombre");
             return gson.toJson(BuscadorCanciones.buscarPorNombre(dao.obtenerCanciones(), nombre));
         });
 
-        // Buscar por artista
+        // 🔍 Buscar por artista
         get("/buscar/artista", (req, res) -> {
             res.type("application/json");
             String artista = req.queryParams("artista");
             return gson.toJson(BuscadorCanciones.buscarPorArtista(dao.obtenerCanciones(), artista));
         });
 
-        // Ordenar por duración
+        // 🔀 Ordenar por duración
         get("/ordenar/duracion", (req, res) -> {
             res.type("application/json");
             return gson.toJson(OrdenadorCanciones.porDuracion(dao.obtenerCanciones()));
         });
 
-        // Ordenar por año
+        // 🔀 Ordenar por año
         get("/ordenar/year", (req, res) -> {
             res.type("application/json");
             return gson.toJson(OrdenadorCanciones.porYear(dao.obtenerCanciones()));
         });
     }
 }
-
-
-
-
-
 
 
